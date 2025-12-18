@@ -77,3 +77,47 @@ rule "Ask relation (male)"
         insert(q);
 end
 
+rule "Ask last gift (dad)"
+    salience 70
+    when
+        State(phase == "MALE")
+        Answer(questionId == "relationMale", value == "Dad")
+        not Question(id == "lastGiftDad")
+    then
+        Question q = new Question();
+        q.setId("lastGiftDad");
+        q.setText("What did you get him last holiday season?");
+        q.setOptions("A tie|Power tools|A mug that says World's #1 Dad|A new grill");
+        q.setAnswered(false);
+        insert(q);
+end
+
+rule "Ask tie count (dad)"
+    salience 60
+    when
+        State(phase == "MALE")
+        Answer(questionId == "lastGiftDad", value == "A tie")
+        not Question(id == "tieCountDad")
+    then
+        Question q = new Question();
+        q.setId("tieCountDad");
+        q.setText("How original... How many ties does he own now?");
+        q.setOptions(">75|<75 but >30");
+        q.setAnswered(false);
+        insert(q);
+end
+
+rule "Ask handy (dad, power tools)"
+    salience 60
+    when
+        State(phase == "MALE")
+        Answer(questionId == "lastGiftDad", value == "Power tools")
+        not Question(id == "handyDad")
+    then
+        Question q = new Question();
+        q.setId("handyDad");
+        q.setText("So Dad is pretty handy, huh?");
+        q.setOptions("Yes|No, he just thinks he is. In reality, he just ends up making worse when he tries to fix them.");
+        q.setAnswered(false);
+        insert(q);
+end
