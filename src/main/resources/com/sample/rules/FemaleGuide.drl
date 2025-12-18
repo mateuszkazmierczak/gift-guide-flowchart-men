@@ -6,6 +6,7 @@ rule "Ask relation (female)"
         // Context: The user has specified the gender is "Female".
         Answer(questionId == "gender", value == "Female")
         not Question(id == "relationFemale")
+        not Answer(questionId == "relationFemale")
     then
         Question q = new Question();
         q.setId("relationFemale");

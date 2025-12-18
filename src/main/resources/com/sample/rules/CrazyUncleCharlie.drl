@@ -6,6 +6,7 @@ rule "Ask Uncle last seen"
         // Context: The user has specified the relation is "Crazy Uncle Charlie".
         Answer(questionId == "relationMale", value == "Crazy Uncle Charlie")
         not Question(id == "uncleLastSeen")
+        not Answer(questionId == "uncleLastSeen")
     then
         Question q = new Question();
         q.setId("uncleLastSeen");

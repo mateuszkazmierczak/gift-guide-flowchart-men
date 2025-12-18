@@ -41,6 +41,7 @@ rule "Ask relation (male)"
         // This is the context-based approach. The rule fires based on a previous answer.
         Answer(questionId == "gender", value == "Male")
         not Question(id == "relationMale")
+        not Answer(questionId == "relationMale")
     then
         Question q = new Question();
         q.setId("relationMale");

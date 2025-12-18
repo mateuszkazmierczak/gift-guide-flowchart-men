@@ -6,6 +6,7 @@ rule "Ask brother age"
         // Context: The user has specified the relation is "Brother".
         Answer(questionId == "relationMale", value == "Brother")
         not Question(id == "brotherAge")
+        not Answer(questionId == "brotherAge")
     then
         Question q = new Question();
         q.setId("brotherAge");
@@ -22,6 +23,7 @@ rule "Ask if older brother picked on you"
         Answer(questionId == "relationMale", value == "Brother")
         Answer(questionId == "brotherAge", value == "Older")
         not Question(id == "pickedOnYou")
+        not Answer(questionId == "pickedOnYou")
     then
         Question q = new Question();
         q.setId("pickedOnYou");
@@ -56,6 +58,7 @@ rule "Ask if picked on younger brother"
         Answer(questionId == "relationMale", value == "Brother")
         Answer(questionId == "brotherAge", value == "Younger")
         not Question(id == "pickedOnBrother")
+        not Answer(questionId == "pickedOnBrother")
     then
         Question q = new Question();
         q.setId("pickedOnBrother");

@@ -6,6 +6,7 @@ rule "Ask if boss"
         // Context: The user has specified the relation is "Co-worker".
         Answer(questionId == "relationMale", value == "Co-worker")
         not Question(id == "isBoss")
+        not Answer(questionId == "isBoss")
     then
         Question q = new Question();
         q.setId("isBoss");
@@ -30,6 +31,7 @@ rule "Ask if like boss"
         Answer(questionId == "relationMale", value == "Co-worker")
         Answer(questionId == "isBoss", value == "Yes")
         not Question(id == "likeBoss")
+        not Answer(questionId == "likeBoss")
     then
         Question q = new Question();
         q.setId("likeBoss");
