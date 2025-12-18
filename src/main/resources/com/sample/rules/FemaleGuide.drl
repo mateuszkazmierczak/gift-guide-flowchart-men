@@ -1,18 +1,450 @@
-package com.sample.rules;
+package com.sample.rules
 
 rule "Ask relation (female)"
     salience -10
     when
-        // Context: The user has specified the gender is "Female".
         Answer(questionId == "gender", value == "Female")
         not Question(id == "relationFemale")
         not Answer(questionId == "relationFemale")
     then
         Question q = new Question();
         q.setId("relationFemale");
-        q.setText("Let’s face it, you are in trouble. Why are you buying her a gift?");
+        q.setText("Let's face it, you are in trouble. Why are you buying her a gift?");
         q.setOptions("Wife|Girlfriend|Mom|Mother-in-law|Sister|Co-worker");
         q.setAnswered(false);
         q.setMultiSelect(false);
         insert(q);
+end
+
+// -------------------------------------------------------------------------------------------------
+// WIFE
+// -------------------------------------------------------------------------------------------------
+
+rule "Ask - Wife: Brewers fan"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Wife")
+        not Question(id == "wifeBrewersFan")
+        not Answer(questionId == "wifeBrewersFan")
+    then
+        Question q = new Question();
+        q.setId("wifeBrewersFan");
+        q.setText("Is she a Brewers fan?");
+        q.setOptions("Yes|Not yet");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Recommendation - Wife: Brewers fan"
+    when
+        Answer(questionId == "wifeBrewersFan", value == "Yes")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "You have found yourself a true life partner. Get her a Holiday 4-Pack as a sign of your gratitude."));
+end
+
+rule "Ask - Wife: Considered buying her clothes?"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Wife")
+        Answer(questionId == "wifeBrewersFan", value == "Not yet")
+        not Question(id == "wifeConsideredClothes")
+        not Answer(questionId == "wifeConsideredClothes")
+    then
+        Question q = new Question();
+        q.setId("wifeConsideredClothes");
+        q.setText("That's unfortunate, but she'll come around. Have you considered buying her clothes?");
+        q.setOptions("Yes|No");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Recommendation - Wife: Clothes no"
+    when
+        Answer(questionId == "relationFemale", value == "Wife")
+        Answer(questionId == "wifeConsideredClothes", value == "No")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Good decision. You know your limitations. Get her a Holiday 4-Pack and spend your next few weekends watching college football instead of braving shopping malls only to get her a shirt she will return anyway."));
+end
+
+rule "Ask - Wife: Do you even know her size?"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Wife")
+        Answer(questionId == "wifeConsideredClothes", value == "Yes")
+        not Question(id == "wifeKnowHerSize")
+        not Answer(questionId == "wifeKnowHerSize")
+    then
+        Question q = new Question();
+        q.setId("wifeKnowHerSize");
+        q.setText("Really? You should know by now that no woman actually wants a man picking out her clothes. Do you even know her size?");
+        q.setOptions("Sure. I'm a size 36 so she's probably like a 32.|Not a Chance");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Recommendation - Wife: Size guess"
+    when
+        Answer(questionId == "relationFemale", value == "Wife")
+        Answer(questionId == "wifeKnowHerSize", value.startsWith("Sure"))
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Oh boy, just get her the Holiday 4-Pack. Trust us, you'll thank us later."));
+end
+
+rule "Recommendation - Wife: Not a chance"
+    when
+        Answer(questionId == "relationFemale", value == "Wife")
+        Answer(questionId == "wifeKnowHerSize", value == "Not a Chance")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Time to pull the plug on this little experiment and just get her a Holiday 4-Pack."));
+end
+// -------------------------------------------------------------------------------------------------
+// GIRLFRIEND
+// -------------------------------------------------------------------------------------------------
+
+rule "Ask - Girlfriend: Brewers fan"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Girlfriend")
+        not Question(id == "girlfriendBrewersFan")
+        not Answer(questionId == "girlfriendBrewersFan")
+    then
+        Question q = new Question();
+        q.setId("girlfriendBrewersFan");
+        q.setText("Is she a Brewers fan?");
+        q.setOptions("Yes|Not yet");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Recommendation - Girlfriend: Yes"
+    when
+        Answer(questionId == "relationFemale", value == "Girlfriend")
+        Answer(questionId == "girlfriendBrewersFan", value == "Yes")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Nice, Bro! Get her a Holiday 4-Pack to make sure you don't screw this up."));
+end
+
+rule "Recommendation - Girlfriend: Not yet"
+    when
+        Answer(questionId == "relationFemale", value == "Girlfriend")
+        Answer(questionId == "girlfriendBrewersFan", value == "Not yet")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Dump her. But first give her a Holiday 4-Pack to soften the blow."));
+end
+
+// -------------------------------------------------------------------------------------------------
+// MOM
+// -------------------------------------------------------------------------------------------------
+
+rule "Ask - Mom: Brewers fan"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Mom")
+        not Question(id == "momBrewersFan")
+        not Answer(questionId == "momBrewersFan")
+    then
+        Question q = new Question();
+        q.setId("momBrewersFan");
+        q.setText("Is she a Brewers fan?");
+        q.setOptions("Yes|She's not really in to sports.");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Recommendation - Mom: Yes"
+    when
+        Answer(questionId == "relationFemale", value == "Mom")
+        Answer(questionId == "momBrewersFan", value == "Yes")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Obviously you got your brains from your mother. Earn the title of 'favorite child' by getting her a Holiday 4-Pack."));
+end
+
+rule "Ask - Mom: What else does she like?"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Mom")
+        Answer(questionId == "momBrewersFan", value == "She's not really in to sports.")
+        not Question(id == "momLikes")
+        not Answer(questionId == "momLikes")
+    then
+        Question q = new Question();
+        q.setId("momLikes");
+        q.setText("What else does she like? (Select all that apply)");
+        q.setOptions("A fun day/night out|Quality time with family/friends|Delicious food and drink|Collecting holiday ornaments");
+        q.setAnswered(false);
+        q.setMultiSelect(true);
+        insert(q);
+end
+
+rule "Recommendation - Mom: Miller Park" 
+    when
+        Answer(questionId == "relationFemale", value == "Mom")
+        Answer(questionId == "momLikes", !value.contains("Collecting holiday ornaments"))
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Well that was easy... Get her a Holiday 4-Pack. She can enjoy all of those things at Miller Park."));
+end
+
+rule "Recommendation - Mom: Ornaments"
+    when
+        Answer(questionId == "relationFemale", value == "Mom")
+        Answer(questionId == "momLikes", value.contains("Collecting holiday ornaments"))
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Perfect! You get a free Bernie Brewer ornament with every pair of Holiday 4-Packs you buy."));
+end
+// -------------------------------------------------------------------------------------------------
+// MOTHER-IN-LAW
+// -------------------------------------------------------------------------------------------------
+
+rule "Ask - Mother-in-law: What does she really want for the holidays?"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Mother-in-law")
+        not Question(id == "milWants")
+        not Answer(questionId == "milWants")
+    then
+        Question q = new Question();
+        q.setId("milWants");
+        q.setText("What does she really want for the holidays?");
+        q.setOptions("Fruit cake|A 'Home is Where the Heart Is' Plaque|Hand-knit sweater for her lap dog|One of those creepy posters where the kids are dressed up like adults");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Recommendation - Mother-in-law: Fruit cake"
+    when
+        Answer(questionId == "relationFemale", value == "Mother-in-law")
+        Answer(questionId == "milWants", value == "Fruit cake")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Have you ever actually tried fruitcake? Nobody likes that stuff. For just a minute, forget about what she wants... AH HA! Get her a gift you will not be ashamed to buy - like a Holiday 4-Pack."));
+end
+
+rule "Recommendation - Mother-in-law: Heart plaque"
+    when
+        Answer(questionId == "relationFemale", value == "Mother-in-law")
+        Answer(questionId == "milWants", value == "A 'Home is Where the Heart Is' Plaque")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "As if she doesn't already have enough of those... For just a minute, forget about what she wants... AH HA! Get her a gift you will not be ashamed to buy - like a Holiday 4-Pack."));
+end
+
+rule "Recommendation - Mother-in-law: Lap dog sweater"
+    when
+        Answer(questionId == "relationFemale", value == "Mother-in-law")
+        Answer(questionId == "milWants", value == "Hand-knit sweater for her lap dog")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "We both know how much you hate hand-knit sweaters. And lap dogs. And dogs in human clothes. For just a minute, forget about what she wants... AH HA! Get her a gift you will not be ashamed to buy - like a Holiday 4-Pack."));
+end
+
+rule "Recommendation - Mother-in-law: Creepy posters"
+    when
+        Answer(questionId == "relationFemale", value == "Mother-in-law")
+        Answer(questionId == "milWants", value == "One of those creepy posters where the kids are dressed up like adults")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Do you really want to endure the strange looks you will get when you buy this? You'd better keep thinking... She's still mad at you for ruining Christmas last year. AH HA! Get her a gift you will not be ashamed to buy - like a Holiday 4-Pack."));
+end
+
+// -------------------------------------------------------------------------------------------------
+// SISTER
+// -------------------------------------------------------------------------------------------------
+
+rule "Ask - Sister: Older or Younger?"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Sister")
+        not Question(id == "sisterOlderYounger")
+        not Answer(questionId == "sisterOlderYounger")
+    then
+        Question q = new Question();
+        q.setId("sisterOlderYounger");
+        q.setText("Older or Younger?");
+        q.setOptions("Older|Younger");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Recommendation - Sister: Older"
+    when
+        Answer(questionId == "relationFemale", value == "Sister")
+        Answer(questionId == "sisterOlderYounger", value == "Older")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "The woman probably changed your diapers when you were a baby. You owe her BIG TIME. Get her a Holiday 4-Pack."));
+end
+
+rule "Ask - Sister: Was she spoiled as a child?"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Sister")
+        Answer(questionId == "sisterOlderYounger", value == "Younger")
+        not Question(id == "sisterSpoiled")
+        not Answer(questionId == "sisterSpoiled")
+    then
+        Question q = new Question();
+        q.setId("sisterSpoiled");
+        q.setText("Was she spoiled as a child?");
+        q.setOptions("Yes|No, she was adorable!");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+// Path: Sister -> Younger -> No, she was adorable!
+rule "Ask - Sister: Got everything (No)"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Sister")
+        Answer(questionId == "sisterSpoiled", value == "No, she was adorable!")
+        not Question(id == "sisterGotEverything")
+        not Answer(questionId == "sisterGotEverything")
+    then
+        Question q = new Question();
+        q.setId("sisterGotEverything");
+        q.setText("Got everything she ever wanted. One Christmas, she got a pony. The best thing I got that year was a pack of new socks.");
+        q.setOptions("Continue");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Ask - Sister: You're still dwelling on this?"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Sister")
+        Answer(questionId == "sisterGotEverything", value == "Continue")
+        not Question(id == "sisterDwelling")
+        not Answer(questionId == "sisterDwelling")
+    then
+        Question q = new Question();
+        q.setId("sisterDwelling");
+        q.setText("You're still dwelling on this?");
+        q.setOptions("Continue");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Ask - Sister: Time to start fresh"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Sister")
+        Answer(questionId == "sisterDwelling", value == "Continue")
+        not Question(id == "sisterStartFresh")
+        not Answer(questionId == "sisterStartFresh")
+    then
+        Question q = new Question();
+        q.setId("sisterStartFresh");
+        q.setText("Time to start fresh. 'Tis the season for giving and forgiving!");
+        q.setOptions("Continue");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Recommendation - Sister: No (Final)"
+    when
+        Answer(questionId == "relationFemale", value == "Sister")
+        Answer(questionId == "sisterStartFresh", value == "Continue")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Get her a Holiday 4-Pack. You can never go wrong with that."));
+end
+
+// Path: Sister -> Younger -> Yes
+rule "Ask - Sister: Still mad (Yes)"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Sister")
+        Answer(questionId == "sisterSpoiled", value == "Yes")
+        not Question(id == "sisterStillMad")
+        not Answer(questionId == "sisterStillMad")
+    then
+        Question q = new Question();
+        q.setId("sisterStillMad");
+        q.setText("She's still mad at you for ruining Christmas last year.");
+        q.setOptions("Continue");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Ask - Sister: Keep thinking"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Sister")
+        Answer(questionId == "sisterStillMad", value == "Continue")
+        not Question(id == "sisterKeepThinking")
+        not Answer(questionId == "sisterKeepThinking")
+    then
+        Question q = new Question();
+        q.setId("sisterKeepThinking");
+        q.setText("You'd better keep thinking...");
+        q.setOptions("Continue");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Ask - Sister: Forget what she wants"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Sister")
+        Answer(questionId == "sisterKeepThinking", value == "Continue")
+        not Question(id == "sisterForgetWants")
+        not Answer(questionId == "sisterForgetWants")
+    then
+        Question q = new Question();
+        q.setId("sisterForgetWants");
+        q.setText("For just a minute, forget about what she wants...");
+        q.setOptions("Continue");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Recommendation - Sister: Yes (Final)"
+    when
+        Answer(questionId == "relationFemale", value == "Sister")
+        Answer(questionId == "sisterForgetWants", value == "Continue")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "AH HA! Get her a gift you will not be ashamed to buy - like a Holiday 4-Pack."));
+end
+
+// -------------------------------------------------------------------------------------------------
+// CO-WORKER
+// -------------------------------------------------------------------------------------------------
+
+rule "Ask - Co-worker: Do you know anything about this person?"
+    salience -10
+    when
+        Answer(questionId == "relationFemale", value == "Co-worker")
+        not Question(id == "coworkerKnowAnything")
+        not Answer(questionId == "coworkerKnowAnything")
+    then
+        Question q = new Question();
+        q.setId("coworkerKnowAnything");
+        q.setText("Do you know anything about this person?");
+        q.setOptions("I think she has a cat.|Nope. Drew her name out of a hat for Secret Santa.");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Recommendation - Co-worker: Cat"
+    when
+        Answer(questionId == "relationFemale", value == "Co-worker")
+        Answer(questionId == "coworkerKnowAnything", value == "I think she has a cat.")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "You could get her a cat toy... Of course, then she will know that you think she is the crazy cat lady. A Holiday 4-Pack is safer."));
+end
+
+rule "Recommendation - Co-worker: Secret Santa"
+    when
+        Answer(questionId == "relationFemale", value == "Co-worker")
+        Answer(questionId == "coworkerKnowAnything", value == "Nope. Drew her name out of a hat for Secret Santa.")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Get her a Holiday 4-Pack. You can never go wrong with that."));
 end
