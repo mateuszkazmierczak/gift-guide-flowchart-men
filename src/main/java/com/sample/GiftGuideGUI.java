@@ -26,26 +26,43 @@ public class GiftGuideGUI {
     private boolean isMultiSelect;
 
     public GiftGuideGUI() {
-        // Initialize Drools
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();
         kSession = kContainer.newKieSession("ksession-rules");
 
-        // Initialize GUI
         frame = new JFrame("Gift Guide");
+        frame.setLayout(new BorderLayout());
+
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
         questionLabel = new JLabel();
+        questionLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        questionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(questionLabel);
+        panel.add(Box.createVerticalStrut(15));
+
         optionButtons = new ArrayList<>();
         optionsGroup = new ButtonGroup();
         nextButton = new JButton("Next");
-        
-        frame.add(panel);
-        frame.setSize(500, 300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Start
+        frame.add(panel, BorderLayout.CENTER);
+
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottomPanel.add(nextButton);
+        frame.add(bottomPanel, BorderLayout.SOUTH);
+
+        frame.setSize(600, 450);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+
         kSession.fireAllRules();
         showNext();
 
@@ -55,12 +72,10 @@ public class GiftGuideGUI {
                 handleAnswer();
             }
         });
-        panel.add(nextButton);
         frame.setVisible(true);
     }
 
     private void showNext() {
-        // Remove old options from panel
         for (AbstractButton btn : optionButtons) {
             panel.remove(btn);
         }
@@ -68,33 +83,25 @@ public class GiftGuideGUI {
         optionsGroup = new ButtonGroup();
         currentQuestionId = null;
         isMultiSelect = false;
-        
-        // Move nextButton to the end of the panel
-        panel.remove(nextButton);
 
-
-        // Check for Recommendation
         Object recommendation = getFactBySimpleName("Recommendation");
         if (recommendation != null) {
             try {
                 String gift = (String) recommendation.getClass().getMethod("getGift").invoke(recommendation);
                 String reason = (String) recommendation.getClass().getMethod("getReason").invoke(recommendation);
-                questionLabel.setText("<html>Recommended gift: " + gift + "<br>Reason: " + reason + "</html>");
+                questionLabel.setText("<html><body style='width: 450px'><h2>Recommended gift: " + gift + "</h2><br>Reason: " + reason + "</body></html>");
                 nextButton.setEnabled(false);
             } catch (Exception ex) {
                 questionLabel.setText("Error displaying recommendation");
             }
-            panel.add(nextButton);
             frame.revalidate();
             frame.repaint();
             return;
         }
 
-        // Find next Question
         Object question = getFactBySimpleName("Question");
         if (question != null) {
             try {
-                // Use reflection to get question properties
                 Method getId = question.getClass().getMethod("getId");
                 Method getText = question.getClass().getMethod("getText");
                 Method getOptions = question.getClass().getMethod("getOptions");
@@ -105,19 +112,19 @@ public class GiftGuideGUI {
                 String options = (String) getOptions.invoke(question);
                 isMultiSelect = (boolean) getMultiSelect.invoke(question);
 
-                questionLabel.setText("<html>" + text + "</html>");
+                questionLabel.setText("<html><body style='width: 450px'>" + text + "</body></html>");
 
                 for (String opt : options.split("\\|")) {
+                    AbstractButton btn;
                     if (isMultiSelect) {
-                        JCheckBox btn = new JCheckBox(opt);
-                        optionButtons.add(btn);
-                        panel.add(btn);
+                        btn = new JCheckBox(opt);
                     } else {
-                        JRadioButton btn = new JRadioButton(opt);
+                        btn = new JRadioButton(opt);
                         optionsGroup.add(btn);
-                        optionButtons.add(btn);
-                        panel.add(btn);
                     }
+                    btn.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    optionButtons.add(btn);
+                    panel.add(btn);
                 }
                 nextButton.setEnabled(true);
 
@@ -128,8 +135,7 @@ public class GiftGuideGUI {
             questionLabel.setText("No more questions or final recommendation found.");
             nextButton.setEnabled(false);
         }
-        
-        panel.add(nextButton);
+
         frame.revalidate();
         frame.repaint();
     }
@@ -154,7 +160,6 @@ public class GiftGuideGUI {
 
         if (selectedValue != null && !selectedValue.isEmpty() && currentQuestionId != null) {
             try {
-                // Retract the old question before inserting the answer
                 Object oldQuestion = getFactBySimpleName("Question");
                 if (oldQuestion != null) {
                      kSession.delete(kSession.getFactHandle(oldQuestion));
@@ -180,7 +185,6 @@ public class GiftGuideGUI {
     }
 
     private Object createAnswer(String questionId, String value) throws Exception {
-        // Using reflection to create an Answer fact, as required
         Class<?> answerClass = kSession.getKieBase().getFactType("com.sample.rules", "Answer").getFactClass();
         Object answer = answerClass.getDeclaredConstructor().newInstance();
         answerClass.getMethod("setQuestionId", String.class).invoke(answer, questionId);
