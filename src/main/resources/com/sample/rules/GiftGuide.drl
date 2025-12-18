@@ -1,0 +1,65 @@
+package com.sample.rules
+
+declare Question
+    id : String
+    text : String
+    options : String
+    answered : boolean
+end
+
+declare Answer
+    questionId : String
+    value : String
+end
+
+declare Recommendation
+    gift : String
+    reason : String
+end
+
+declare State
+    phase : String
+end
+
+global javax.swing.JFrame frame;
+
+rule "Start"
+    salience 1000
+    when
+        not State()
+    then
+        insert(new State("START"));
+end
+
+rule "Ask gender"
+    salience 100
+    when
+        State(phase == "START")
+        not Question(id == "gender")
+    then
+        Question q = new Question();
+        q.setId("gender");
+        q.setText("What is the gender of the person receiving your gift?");
+        q.setOptions("Male|Female");
+        q.setAnswered(false);
+        insert(q);
+end
+
+rule "Gender is Male"
+    salience 90
+    when
+        $s : State(phase == "START")
+        Answer(questionId == "gender", value == "Male")
+    then
+        modify($s) { setPhase("MALE") };
+end
+
+rule "Gender is Female"
+    salience 90
+    when
+        $s : State(phase == "START")
+        Answer(questionId == "gender", value == "Female")
+    then
+        modify($s) { setPhase("FEMALE") };
+end
+
