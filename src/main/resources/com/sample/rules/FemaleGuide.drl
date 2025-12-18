@@ -245,7 +245,7 @@ rule "Recommendation - Mother-in-law: Creepy posters"
         Answer(questionId == "relationFemale", value == "Mother-in-law")
         Answer(questionId == "milWants", value == "One of those creepy posters where the kids are dressed up like adults")
     then
-        insert(new Recommendation("Holiday 4-Pack", "Do you really want to endure the strange looks you will get when you buy this? You'd better keep thinking... She's still mad at you for ruining Christmas last year. AH HA! Get her a gift you will not be ashamed to buy - like a Holiday 4-Pack."));
+        insert(new Recommendation("Holiday 4-Pack", "Do you really want to endure the strange looks you will get when you buy this? For just a minute, forget about what she wants...  AH HA! Get her a gift you will not be ashamed to buy - like a Holiday 4-Pack."));
 end
 
 // -------------------------------------------------------------------------------------------------
@@ -293,18 +293,18 @@ rule "Ask - Sister: Was she spoiled as a child?"
         insert(q);
 end
 
-// Path: Sister -> Younger -> No, she was adorable!
+
 rule "Ask - Sister: Got everything (No)"
     salience -10
     when
         Answer(questionId == "relationFemale", value == "Sister")
         Answer(questionId == "sisterSpoiled", value == "No, she was adorable!")
-        not Question(id == "sisterGotEverything")
-        not Answer(questionId == "sisterGotEverything")
+        not Question(id == "sisterCantWait")
+        not Answer(questionId == "sisterCantWait")
     then
         Question q = new Question();
-        q.setId("sisterGotEverything");
-        q.setText("Got everything she ever wanted. One Christmas, she got a pony. The best thing I got that year was a pack of new socks.");
+        q.setId("sisterCantWait");
+        q.setText("You know you can't wait to see her face light up when she opens that Holiday 4-Pack. Just think of the memories you'll make.");
         q.setOptions("Continue");
         q.setAnswered(false);
         q.setMultiSelect(false);
@@ -348,23 +348,23 @@ end
 rule "Recommendation - Sister: No (Final)"
     when
         Answer(questionId == "relationFemale", value == "Sister")
-        Answer(questionId == "sisterStartFresh", value == "Continue")
+        Answer(questionId == "sisterStartFresh", value == "__DISABLED__")
     then
         insert(new Recommendation("Holiday 4-Pack", "Get her a Holiday 4-Pack. You can never go wrong with that."));
 end
 
-// Path: Sister -> Younger -> Yes
+
 rule "Ask - Sister: Still mad (Yes)"
     salience -10
     when
         Answer(questionId == "relationFemale", value == "Sister")
         Answer(questionId == "sisterSpoiled", value == "Yes")
-        not Question(id == "sisterStillMad")
-        not Answer(questionId == "sisterStillMad")
+        not Question(id == "sisterGotEverything")
+        not Answer(questionId == "sisterGotEverything")
     then
         Question q = new Question();
-        q.setId("sisterStillMad");
-        q.setText("She's still mad at you for ruining Christmas last year.");
+        q.setId("sisterGotEverything");
+        q.setText("Got everything she ever wanted. One Christmas, she got a pony. The best thing I got that year was a pack of new socks.");
         q.setOptions("Continue");
         q.setAnswered(false);
         q.setMultiSelect(false);
@@ -375,43 +375,20 @@ rule "Ask - Sister: Keep thinking"
     salience -10
     when
         Answer(questionId == "relationFemale", value == "Sister")
-        Answer(questionId == "sisterStillMad", value == "Continue")
-        not Question(id == "sisterKeepThinking")
-        not Answer(questionId == "sisterKeepThinking")
+        Answer(questionId == "sisterStartFresh", value == "Continue")
+        not Question(id == "sisterCantWait")
+        not Answer(questionId == "sisterCantWait")
     then
         Question q = new Question();
-        q.setId("sisterKeepThinking");
-        q.setText("You'd better keep thinking...");
+        q.setId("sisterCantWait");
+        q.setText("You know you can't wait to see her face light up when she opens that Holiday 4-Pack. Just think of the memories you'll make.");
         q.setOptions("Continue");
         q.setAnswered(false);
         q.setMultiSelect(false);
         insert(q);
 end
 
-rule "Ask - Sister: Forget what she wants"
-    salience -10
-    when
-        Answer(questionId == "relationFemale", value == "Sister")
-        Answer(questionId == "sisterKeepThinking", value == "Continue")
-        not Question(id == "sisterForgetWants")
-        not Answer(questionId == "sisterForgetWants")
-    then
-        Question q = new Question();
-        q.setId("sisterForgetWants");
-        q.setText("For just a minute, forget about what she wants...");
-        q.setOptions("Continue");
-        q.setAnswered(false);
-        q.setMultiSelect(false);
-        insert(q);
-end
 
-rule "Recommendation - Sister: Yes (Final)"
-    when
-        Answer(questionId == "relationFemale", value == "Sister")
-        Answer(questionId == "sisterForgetWants", value == "Continue")
-    then
-        insert(new Recommendation("Holiday 4-Pack", "AH HA! Get her a gift you will not be ashamed to buy - like a Holiday 4-Pack."));
-end
 
 // -------------------------------------------------------------------------------------------------
 // CO-WORKER
