@@ -63,3 +63,17 @@ rule "Gender is Female"
         modify($s) { setPhase("FEMALE") };
 end
 
+rule "Ask relation (male)"
+    salience 80
+    when
+        State(phase == "MALE")
+        not Question(id == "relationMale")
+    then
+        Question q = new Question();
+        q.setId("relationMale");
+        q.setText("This is gonna be hard. Guys don't buy gifts for other guys. Why are you buying him a gift?");
+        q.setOptions("Dad|Brother|Crazy Uncle Charlie|Co-worker|Father-in-law");
+        q.setAnswered(false);
+        insert(q);
+end
+
