@@ -1,0 +1,71 @@
+package com.sample.rules
+
+rule "Relation is Co-worker"
+    when
+        $s : State(phase == "MALE")
+        Answer(questionId == "relationMale", value == "Co-worker")
+    then
+        modify($s) { setPhase("MALE_COWORKER") };
+end
+
+rule "Ask if boss"
+    salience -10
+    when
+        State(phase == "MALE_COWORKER")
+        not Question(id == "isBoss")
+    then
+        Question q = new Question();
+        q.setId("isBoss");
+        q.setText("Is this person your boss?");
+        q.setOptions("No|Yes");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Co-worker is not boss"
+    when
+        State(phase == "MALE_COWORKER")
+        Answer(questionId == "isBoss", value == "No")
+    then
+        insert(new Recommendation("Holiday 4-Pack (for yourself)", "No need to buy this person a gift. Take the money you would have spent and put it towards a Holiday 4-Pack of your own."));
+end
+
+rule "Co-worker is boss"
+    when
+        $s : State(phase == "MALE_COWORKER")
+        Answer(questionId == "isBoss", value == "Yes")
+    then
+        modify($s) { setPhase("MALE_COWORKER_BOSS") };
+end
+
+rule "Ask if like boss"
+    salience -10
+    when
+        State(phase == "MALE_COWORKER_BOSS")
+        not Question(id == "likeBoss")
+    then
+        Question q = new Question();
+        q.setId("likeBoss");
+        q.setText("Do you like him?");
+        q.setOptions("No|Yes");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Do not like boss"
+    when
+        State(phase == "MALE_COWORKER_BOSS")
+        Answer(questionId == "likeBoss", value == "No")
+    then
+        insert(new Recommendation("Holiday 4-Pack (weekday games)", "Get him a Holiday 4-Pack consisting of 4 weekday, day games and enjoy the extra time he is out of the office"));
+end
+
+rule "Like boss"
+    when
+        State(phase == "MALE_COWORKER_BOSS")
+        Answer(questionId == "likeBoss", value == "Yes")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Get him a Holiday 4-Pack. Can you say 'promotion'?"));
+end

@@ -1,0 +1,32 @@
+package com.sample.rules
+
+rule "Relation is Crazy Uncle Charlie"
+    when
+        $s : State(phase == "MALE")
+        Answer(questionId == "relationMale", value == "Crazy Uncle Charlie")
+    then
+        modify($s) { setPhase("MALE_UNCLE") };
+end
+
+rule "Ask Uncle last seen"
+    salience -10
+    when
+        State(phase == "MALE_UNCLE")
+        not Question(id == "uncleLastSeen")
+    then
+        Question q = new Question();
+        q.setId("uncleLastSeen");
+        q.setText("Ah, yes, Crazy Uncle Charlie... When was the last time you saw him?");
+        q.setOptions("Last Christmas - He drank too much eggnog and passed out on the couch while watching basketball|A couple weeks ago at Thanksgiving - He ate too much turkey and passed out on the couch while watching football|Last week when he invited himself over then passed out on the couch while waching 'Scandal'");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Uncle recommendation"
+    when
+        State(phase == "MALE_UNCLE")
+        Answer(questionId == "uncleLastSeen")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Get him a Holiday 4-Pack and get him off your couch!"));
+end

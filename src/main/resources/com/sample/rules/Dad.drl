@@ -10,6 +10,7 @@ rule "Relation is Dad"
 end
 
 rule "Ask last gift for Dad"
+    salience -10
     when
         State(phase == "MALE_DAD")
         not Question(id == "lastGiftDad")
@@ -32,6 +33,7 @@ rule "Dad's last gift was a Tie"
 end
 
 rule "Ask how many ties Dad owns"
+    salience -10
     when
         State(phase == "MALE_DAD_TIE")
         not Question(id == "tiesOwned")
@@ -70,6 +72,7 @@ rule "Dad's last gift was Power Tools"
 end
 
 rule "Ask if Dad is handy"
+    salience -10
     when
         State(phase == "MALE_DAD_TOOLS")
         not Question(id == "dadHandy")
@@ -108,6 +111,7 @@ rule "Dad's last gift was a Mug"
 end
 
 rule "Ask if Dad uses mug"
+    salience -10
     when
         State(phase == "MALE_DAD_MUG")
         not Question(id == "dadUsesMug")
@@ -146,6 +150,7 @@ rule "Dad's last gift was a Grill"
 end
 
 rule "Ask if Dad started fire with grill"
+    salience -10
     when
         State(phase == "MALE_DAD_GRILL")
         not Question(id == "grillFire")

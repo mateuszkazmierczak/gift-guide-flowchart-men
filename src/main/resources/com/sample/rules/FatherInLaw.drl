@@ -1,0 +1,9 @@
+package com.sample.rules
+
+rule "Relation is Father-in-law"
+    when
+        State(phase == "MALE")
+        Answer(questionId == "relationMale", value == "Father-in-law")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Face it, you’ll never be good enough for his daughter. Your best chance of redeeming yourself would be to get him a Holiday 4-Pack."));
+end
