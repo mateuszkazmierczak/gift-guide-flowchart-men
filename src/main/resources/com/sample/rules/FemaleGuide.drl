@@ -1,15 +1,17 @@
-package com.sample.rules
+package com.sample.rules;
 
 rule "Ask relation (female)"
-    salience 100
+    salience -10
     when
-        State(phase == "FEMALE")
+        // Context: The user has specified the gender is "Female".
+        Answer(questionId == "gender", value == "Female")
         not Question(id == "relationFemale")
     then
         Question q = new Question();
         q.setId("relationFemale");
-        q.setText("Let's face it, you are in trouble. Why are you buying her a gift?");
+        q.setText("Let’s face it, you are in trouble. Why are you buying her a gift?");
         q.setOptions("Wife|Girlfriend|Mom|Mother-in-law|Sister|Co-worker");
         q.setAnswered(false);
+        q.setMultiSelect(false);
         insert(q);
 end

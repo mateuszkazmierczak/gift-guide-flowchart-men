@@ -1,17 +1,10 @@
 package com.sample.rules
 
-rule "Relation is Brother"
-    when
-        $s : State(phase == "MALE")
-        Answer(questionId == "relationMale", value == "Brother")
-    then
-        modify($s) { setPhase("MALE_BROTHER") };
-end
-
 rule "Ask brother age"
     salience -10
     when
-        State(phase == "MALE_BROTHER")
+        // Context: The user has specified the relation is "Brother".
+        Answer(questionId == "relationMale", value == "Brother")
         not Question(id == "brotherAge")
     then
         Question q = new Question();
@@ -87,7 +80,8 @@ end
 
 rule "Picked on younger brother"
     when
-        State(phase == "MALE_BROTHER_YOUNGER")
+        Answer(questionId == "relationMale", value == "Brother")
+        Answer(questionId == "brotherAge", value == "Younger")
         Answer(questionId == "pickedOnBrother", value == "Yeah, sure did")
     then
         insert(new Recommendation("Holiday 4-Pack", "Show him how much you've grown and make amends for your adolescent bullying by getting him a Holiday 4-pack."));
@@ -95,7 +89,8 @@ end
 
 rule "Did not pick on younger brother"
     when
-        State(phase == "MALE_BROTHER_YOUNGER")
+        Answer(questionId == "relationMale", value == "Brother")
+        Answer(questionId == "brotherAge", value == "Younger")
         Answer(questionId == "pickedOnBrother", value == "No, never!")
     then
         insert(new Recommendation("Holiday 4-Pack", "You are the best older brother ever! You have probably already bought him multiple Holiday 4- Packs."));

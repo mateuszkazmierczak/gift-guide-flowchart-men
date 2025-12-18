@@ -1,17 +1,10 @@
 package com.sample.rules
 
-rule "Relation is Crazy Uncle Charlie"
-    when
-        $s : State(phase == "MALE")
-        Answer(questionId == "relationMale", value == "Crazy Uncle Charlie")
-    then
-        modify($s) { setPhase("MALE_UNCLE") };
-end
-
 rule "Ask Uncle last seen"
     salience -10
     when
-        State(phase == "MALE_UNCLE")
+        // Context: The user has specified the relation is "Crazy Uncle Charlie".
+        Answer(questionId == "relationMale", value == "Crazy Uncle Charlie")
         not Question(id == "uncleLastSeen")
     then
         Question q = new Question();
@@ -25,7 +18,7 @@ end
 
 rule "Uncle recommendation"
     when
-        State(phase == "MALE_UNCLE")
+        Answer(questionId == "relationMale", value == "Crazy Uncle Charlie")
         Answer(questionId == "uncleLastSeen")
     then
         insert(new Recommendation("Holiday 4-Pack", "Get him a Holiday 4-Pack and get him off your couch!"));
