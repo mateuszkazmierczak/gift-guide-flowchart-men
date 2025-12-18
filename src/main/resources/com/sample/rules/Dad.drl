@@ -7,6 +7,7 @@ rule "Ask last gift for Dad"
         // Context: The user has specified the relation is "Dad".
         Answer(questionId == "relationMale", value == "Dad")
         not Question(id == "lastGiftDad")
+        not Answer(questionId == "lastGiftDad")
     then
         Question q = new Question();
         q.setId("lastGiftDad");
@@ -17,19 +18,13 @@ rule "Ask last gift for Dad"
         insert(q);
 end
 
-rule "Dad's last gift was a Tie"
-    when
-        $s : State(phase == "MALE_DAD")
-        Answer(questionId == "lastGiftDad", value == "A tie")
-    then
-        modify($s) { setPhase("MALE_DAD_TIE") };
-end
-
 rule "Ask how many ties Dad owns"
     salience -10
     when
-        State(phase == "MALE_DAD_TIE")
+        Answer(questionId == "relationMale", value == "Dad")
+        Answer(questionId == "lastGiftDad", value == "A tie")
         not Question(id == "tiesOwned")
+        not Answer(questionId == "tiesOwned")
     then
         Question q = new Question();
         q.setId("tiesOwned");
@@ -51,25 +46,20 @@ end
 
 rule "Dad owns <75 but >30 ties"
     when
-        State(phase == "MALE_DAD_TIE")
+        Answer(questionId == "relationMale", value == "Dad")
+        Answer(questionId == "lastGiftDad", value == "A tie")
         Answer(questionId == "tiesOwned", value == "<75 but >30")
     then
         insert(new Recommendation("Holiday 4-Pack", "I know you are worried that Dad needs another tie, but if he can go an entire month without wearing the same tie twice I think he is ok on ties. Let's go with a Holiday 4-Pack this year."));
 end
 
-rule "Dad's last gift was Power Tools"
-    when
-        $s : State(phase == "MALE_DAD")
-        Answer(questionId == "lastGiftDad", value == "Power tools")
-    then
-        modify($s) { setPhase("MALE_DAD_TOOLS") };
-end
-
 rule "Ask if Dad is handy"
     salience -10
     when
-        State(phase == "MALE_DAD_TOOLS")
+        Answer(questionId == "relationMale", value == "Dad")
+        Answer(questionId == "lastGiftDad", value == "Power tools")
         not Question(id == "dadHandy")
+        not Answer(questionId == "dadHandy")
     then
         Question q = new Question();
         q.setId("dadHandy");
@@ -82,7 +72,8 @@ end
 
 rule "Dad is handy"
     when
-        State(phase == "MALE_DAD_TOOLS")
+        Answer(questionId == "relationMale", value == "Dad")
+        Answer(questionId == "lastGiftDad", value == "Power tools")
         Answer(questionId == "dadHandy", value == "Yes")
     then
         insert(new Recommendation("Holiday 4-Pack", "Then he already has all the tools he needs. Get him a Holiday 4-Pack instead."));
@@ -90,25 +81,20 @@ end
 
 rule "Dad is not handy"
     when
-        State(phase == "MALE_DAD_TOOLS")
+        Answer(questionId == "relationMale", value == "Dad")
+        Answer(questionId == "lastGiftDad", value == "Power tools")
         Answer(questionId == "dadHandy", value.startsWith("No"))
     then
         insert(new Recommendation("Holiday 4-Pack", "Stop enabling this behavior and get him a Holiday 4-Pack this year."));
 end
 
-rule "Dad's last gift was a Mug"
-    when
-        $s : State(phase == "MALE_DAD")
-        Answer(questionId == "lastGiftDad", value.contains("Mug"))
-    then
-        modify($s) { setPhase("MALE_DAD_MUG") };
-end
-
 rule "Ask if Dad uses mug"
     salience -10
     when
-        State(phase == "MALE_DAD_MUG")
+        Answer(questionId == "relationMale", value == "Dad")
+        Answer(questionId == "lastGiftDad", value.contains("mug"))
         not Question(id == "dadUsesMug")
+        not Answer(questionId == "dadUsesMug")
     then
         Question q = new Question();
         q.setId("dadUsesMug");
@@ -121,7 +107,8 @@ end
 
 rule "Dad uses mug"
     when
-        State(phase == "MALE_DAD_MUG")
+        Answer(questionId == "relationMale", value == "Dad")
+        Answer(questionId == "lastGiftDad", value.contains("mug"))
         Answer(questionId == "dadUsesMug", value.startsWith("Yes"))
     then
         insert(new Recommendation("Holiday 4-Pack", "Here's what you do: \"accidentally\" drop the mug and get him a Holiday 4-Pack to make up for your clumsiness."));
@@ -129,25 +116,20 @@ end
 
 rule "Dad does not use mug"
     when
-        State(phase == "MALE_DAD_MUG")
+        Answer(questionId == "relationMale", value == "Dad")
+        Answer(questionId == "lastGiftDad", value.contains("mug"))
         Answer(questionId == "dadUsesMug", value.startsWith("No"))
     then
         insert(new Recommendation("Holiday 4-Pack", "Then get him a gift he will actually use... like a Holiday 4-Pack."));
 end
 
-rule "Dad's last gift was a Grill"
-    when
-        $s : State(phase == "MALE_DAD")
-        Answer(questionId == "lastGiftDad", value == "A new grill")
-    then
-        modify($s) { setPhase("MALE_DAD_GRILL") };
-end
-
 rule "Ask if Dad started fire with grill"
     salience -10
     when
-        State(phase == "MALE_DAD_GRILL")
+        Answer(questionId == "relationMale", value == "Dad")
+        Answer(questionId == "lastGiftDad", value == "A new grill")
         not Question(id == "grillFire")
+        not Answer(questionId == "grillFire")
     then
         Question q = new Question();
         q.setId("grillFire");

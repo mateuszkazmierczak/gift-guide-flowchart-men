@@ -18,24 +18,17 @@ end
 
 rule "Co-worker is not boss"
     when
-        State(phase == "MALE_COWORKER")
+        Answer(questionId == "relationMale", value == "Co-worker")
         Answer(questionId == "isBoss", value == "No")
     then
         insert(new Recommendation("Holiday 4-Pack (for yourself)", "No need to buy this person a gift. Take the money you would have spent and put it towards a Holiday 4-Pack of your own."));
 end
 
-rule "Co-worker is boss"
-    when
-        $s : State(phase == "MALE_COWORKER")
-        Answer(questionId == "isBoss", value == "Yes")
-    then
-        modify($s) { setPhase("MALE_COWORKER_BOSS") };
-end
-
 rule "Ask if like boss"
     salience -10
     when
-        State(phase == "MALE_COWORKER_BOSS")
+        Answer(questionId == "relationMale", value == "Co-worker")
+        Answer(questionId == "isBoss", value == "Yes")
         not Question(id == "likeBoss")
     then
         Question q = new Question();

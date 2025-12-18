@@ -16,18 +16,11 @@ rule "Ask brother age"
         insert(q);
 end
 
-rule "Brother is Older"
-    when
-        $s : State(phase == "MALE_BROTHER")
-        Answer(questionId == "brotherAge", value == "Older")
-    then
-        modify($s) { setPhase("MALE_BROTHER_OLDER") };
-end
-
 rule "Ask if older brother picked on you"
     salience -10
     when
-        State(phase == "MALE_BROTHER_OLDER")
+        Answer(questionId == "relationMale", value == "Brother")
+        Answer(questionId == "brotherAge", value == "Older")
         not Question(id == "pickedOnYou")
     then
         Question q = new Question();
@@ -41,7 +34,8 @@ end
 
 rule "Older brother picked on you (Noogie)"
     when
-        $s : State(phase == "MALE_BROTHER_OLDER")
+        Answer(questionId == "relationMale", value == "Brother")
+        Answer(questionId == "brotherAge", value == "Older")
         Answer(questionId == "pickedOnYou", value == "He was a master of the noogie")
     then
         insert(new Recommendation("Holiday 4-Pack", "Here’s what you do: Get him a Holiday 4-Pack, then get yourself a 10-Pack and passive-aggressively demonstrate your newfound superiority."));
@@ -49,24 +43,18 @@ end
 
 rule "Older brother picked on you (No)"
     when
-        State(phase == "MALE_BROTHER_OLDER")
+        Answer(questionId == "relationMale", value == "Brother")
+        Answer(questionId == "brotherAge", value == "Older")
         Answer(questionId == "pickedOnYou", value == "No, never!")
     then
         insert(new Recommendation("Holiday 4-Pack", "You have the best older brother ever! Get a pair of Holiday 4-Packs and enjoy some quality time with this great guy."));
 end
 
-rule "Brother is Younger"
-    when
-        $s : State(phase == "MALE_BROTHER")
-        Answer(questionId == "brotherAge", value == "Younger")
-    then
-        modify($s) { setPhase("MALE_BROTHER_YOUNGER") };
-end
-
 rule "Ask if picked on younger brother"
     salience -10
     when
-        State(phase == "MALE_BROTHER_YOUNGER")
+        Answer(questionId == "relationMale", value == "Brother")
+        Answer(questionId == "brotherAge", value == "Younger")
         not Question(id == "pickedOnBrother")
     then
         Question q = new Question();
