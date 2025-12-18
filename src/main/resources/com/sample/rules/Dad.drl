@@ -1,0 +1,168 @@
+package com.sample.rules
+
+// DAD PATH
+rule "Relation is Dad"
+    when
+        $s : State(phase == "MALE")
+        Answer(questionId == "relationMale", value == "Dad")
+    then
+        modify($s) { setPhase("MALE_DAD") };
+end
+
+rule "Ask last gift for Dad"
+    when
+        State(phase == "MALE_DAD")
+        not Question(id == "lastGiftDad")
+    then
+        Question q = new Question();
+        q.setId("lastGiftDad");
+        q.setText("What did you get him last holiday season?");
+        q.setOptions("A tie|Power tools|A mug that says World's #1 Dad|A new grill");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Dad's last gift was a Tie"
+    when
+        $s : State(phase == "MALE_DAD")
+        Answer(questionId == "lastGiftDad", value == "A tie")
+    then
+        modify($s) { setPhase("MALE_DAD_TIE") };
+end
+
+rule "Ask how many ties Dad owns"
+    when
+        State(phase == "MALE_DAD_TIE")
+        not Question(id == "tiesOwned")
+    then
+        Question q = new Question();
+        q.setId("tiesOwned");
+        q.setText("How original... how many ties does he own now?");
+        q.setOptions(">75|<75 but >30");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Dad owns >75 ties"
+    when
+        State(phase == "MALE_DAD_TIE")
+        Answer(questionId == "tiesOwned", value == ">75")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "I think you can skip a year of the ties. How about this year you get him a gift that won't end up thrown in the back of the closet? Like a Holiday 4-Pack."));
+end
+
+rule "Dad owns <75 but >30 ties"
+    when
+        State(phase == "MALE_DAD_TIE")
+        Answer(questionId == "tiesOwned", value == "<75 but >30")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "I know you are worried that Dad needs another tie, but if he can go an entire month without wearing the same tie twice I think he is ok on ties. Let's go with a Holiday 4-Pack this year."));
+end
+
+rule "Dad's last gift was Power Tools"
+    when
+        $s : State(phase == "MALE_DAD")
+        Answer(questionId == "lastGiftDad", value == "Power tools")
+    then
+        modify($s) { setPhase("MALE_DAD_TOOLS") };
+end
+
+rule "Ask if Dad is handy"
+    when
+        State(phase == "MALE_DAD_TOOLS")
+        not Question(id == "dadHandy")
+    then
+        Question q = new Question();
+        q.setId("dadHandy");
+        q.setText("So Dad is pretty handy huh?");
+        q.setOptions("Yes|No, he just thinks he is. In reality, he just ends up making things worse when he tries to fix them.");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Dad is handy"
+    when
+        State(phase == "MALE_DAD_TOOLS")
+        Answer(questionId == "dadHandy", value == "Yes")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Then he already has all the tools he needs. Get him a Holiday 4-Pack instead."));
+end
+
+rule "Dad is not handy"
+    when
+        State(phase == "MALE_DAD_TOOLS")
+        Answer(questionId == "dadHandy", value.startsWith("No"))
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Stop enabling this behavior and get him a Holiday 4-Pack this year."));
+end
+
+rule "Dad's last gift was a Mug"
+    when
+        $s : State(phase == "MALE_DAD")
+        Answer(questionId == "lastGiftDad", value.contains("Mug"))
+    then
+        modify($s) { setPhase("MALE_DAD_MUG") };
+end
+
+rule "Ask if Dad uses mug"
+    when
+        State(phase == "MALE_DAD_MUG")
+        not Question(id == "dadUsesMug")
+    then
+        Question q = new Question();
+        q.setId("dadUsesMug");
+        q.setText("And does he actually use this mug?");
+        q.setOptions("Yes, that's the problem. He takes it everywhere and it's super embarrassing.|No, I don't know why I even bother getting him gifts if he's not going to use them anyway.");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Dad uses mug"
+    when
+        State(phase == "MALE_DAD_MUG")
+        Answer(questionId == "dadUsesMug", value.startsWith("Yes"))
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Here's what you do: \"accidentally\" drop the mug and get him a Holiday 4-Pack to make up for your clumsiness."));
+end
+
+rule "Dad does not use mug"
+    when
+        State(phase == "MALE_DAD_MUG")
+        Answer(questionId == "dadUsesMug", value.startsWith("No"))
+    then
+        insert(new Recommendation("Holiday 4-Pack", "Then get him a gift he will actually use... like a Holiday 4-Pack."));
+end
+
+rule "Dad's last gift was a Grill"
+    when
+        $s : State(phase == "MALE_DAD")
+        Answer(questionId == "lastGiftDad", value == "A new grill")
+    then
+        modify($s) { setPhase("MALE_DAD_GRILL") };
+end
+
+rule "Ask if Dad started fire with grill"
+    when
+        State(phase == "MALE_DAD_GRILL")
+        not Question(id == "grillFire")
+    then
+        Question q = new Question();
+        q.setId("grillFire");
+        q.setText("Was he so excited to test out the new grill right away that almost started the house on fire?");
+        q.setOptions("Yes, that is exactly what happened.|No... he actually did start the house on fire.");
+        q.setAnswered(false);
+        q.setMultiSelect(false);
+        insert(q);
+end
+
+rule "Dad started fire with grill"
+    when
+        State(phase == "MALE_DAD_GRILL")
+        Answer(questionId == "grillFire")
+    then
+        insert(new Recommendation("Holiday 4-Pack", "For the rest of the family's safety you need to get him a gift that is not a fire hazard... like a Holiday 4-Pack."));
+end

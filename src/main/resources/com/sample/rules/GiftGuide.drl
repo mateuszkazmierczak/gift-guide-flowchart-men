@@ -5,6 +5,7 @@ declare Question
     text : String
     options : String
     answered : boolean
+    multiSelect : boolean
 end
 
 declare Answer
@@ -32,7 +33,7 @@ rule "Start"
 end
 
 rule "Ask gender"
-    salience 100
+    salience -10
     when
         State(phase == "START")
         not Question(id == "gender")
@@ -42,6 +43,7 @@ rule "Ask gender"
         q.setText("What is the gender of the person receiving your gift?");
         q.setOptions("Male|Female");
         q.setAnswered(false);
+        q.setMultiSelect(false);
         insert(q);
 end
 
@@ -64,7 +66,7 @@ rule "Gender is Female"
 end
 
 rule "Ask relation (male)"
-    salience 80
+    salience -10
     when
         State(phase == "MALE")
         not Question(id == "relationMale")
@@ -74,98 +76,6 @@ rule "Ask relation (male)"
         q.setText("This is gonna be hard. Guys don't buy gifts for other guys. Why are you buying him a gift?");
         q.setOptions("Dad|Brother|Crazy Uncle Charlie|Co-worker|Father-in-law");
         q.setAnswered(false);
+        q.setMultiSelect(false);
         insert(q);
-end
-
-rule "Ask last gift (dad)"
-    salience 70
-    when
-        State(phase == "MALE")
-        Answer(questionId == "relationMale", value == "Dad")
-        not Question(id == "lastGiftDad")
-    then
-        Question q = new Question();
-        q.setId("lastGiftDad");
-        q.setText("What did you get him last holiday season?");
-        q.setOptions("A tie|Power tools|A mug that says World's #1 Dad|A new grill");
-        q.setAnswered(false);
-        insert(q);
-end
-
-rule "Ask tie count (dad)"
-    salience 60
-    when
-        State(phase == "MALE")
-        Answer(questionId == "lastGiftDad", value == "A tie")
-        not Question(id == "tieCountDad")
-    then
-        Question q = new Question();
-        q.setId("tieCountDad");
-        q.setText("How original... How many ties does he own now?");
-        q.setOptions(">75|<75 but >30");
-        q.setAnswered(false);
-        insert(q);
-end
-
-rule "Ask handy (dad, power tools)"
-    salience 60
-    when
-        State(phase == "MALE")
-        Answer(questionId == "lastGiftDad", value == "Power tools")
-        not Question(id == "handyDad")
-    then
-        Question q = new Question();
-        q.setId("handyDad");
-        q.setText("So Dad is pretty handy, huh?");
-        q.setOptions("Yes|No, he just thinks he is. In reality, he just ends up making worse when he tries to fix them.");
-        q.setAnswered(false);
-        insert(q);
-end
-
-rule "Recommendation: Dad ties > 75"
-    salience 50
-    when
-        State(phase == "MALE")
-        Answer(questionId == "tieCountDad", value == ">75")
-    then
-        Recommendation r = new Recommendation();
-        r.setGift("Holiday 4-Pack");
-        r.setReason("I think you can skip a year of the ties. How about this year you get him a gift that won't end up thrown in the back of the closet? Like a Holiday 4-Pack.");
-        insert(r);
-end
-
-rule "Recommendation: Dad ties < 75 but > 30"
-    salience 50
-    when
-        State(phase == "MALE")
-        Answer(questionId == "tieCountDad", value == "<75 but >30")
-    then
-        Recommendation r = new Recommendation();
-        r.setGift("Holiday 4-Pack");
-        r.setReason("I know you are worried that Dad needs another tie, but if he can go an entire month without wearing the same tie twice I think he is ok on ties. Let's go with a Holiday 4-Pack this year.");
-        insert(r);
-end
-
-rule "Recommendation: Dad handy Yes"
-    salience 50
-    when
-        State(phase == "MALE")
-        Answer(questionId == "handyDad", value == "Yes")
-    then
-        Recommendation r = new Recommendation();
-        r.setGift("Holiday 4-Pack");
-        r.setReason("Then he already has all the tools he needs. Get him a Holiday 4-Pack instead.");
-        insert(r);
-end
-
-rule "Recommendation: Dad handy No"
-    salience 50
-    when
-        State(phase == "MALE")
-        Answer(questionId == "handyDad", value == "No, he just thinks he is. In reality, he just ends up making worse when he tries to fix them.")
-    then
-        Recommendation r = new Recommendation();
-        r.setGift("Holiday 4-Pack");
-        r.setReason("Stop enabling this behavior and get him a Holiday 4-Pack this year.");
-        insert(r);
 end
